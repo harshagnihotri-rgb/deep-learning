@@ -32,7 +32,7 @@ def test_review_interaction():
     app.text_area[0].set_value('This is not good')
     next(b for b in app.button if b.label == 'Analyze review').click().run(timeout=60)
     assert not app.exception
-    assert any('Negative' in str(j.value) for j in app.json)
+    assert any('Negative' in heading.value for heading in app.subheader)
 
 def test_app_renders_and_purchase_form_works():
     from streamlit.testing.v1 import AppTest
