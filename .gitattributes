@@ -1,0 +1,6 @@
+* text=auto
+*.pdf binary
+*.pth binary
+*.joblib binary
+*.png binary
+*.jpg binary

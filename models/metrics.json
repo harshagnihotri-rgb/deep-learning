@@ -1,0 +1,41 @@
+{
+  "dataset": "UCI Online Shoppers Purchasing Intention (468)",
+  "source": "https://archive.ics.uci.edu/static/public/468/online+shoppers+purchasing+intention+dataset.zip",
+  "license": "CC BY 4.0",
+  "dataset_sha256": "b3055ee355f59134d851d32641183cb4a8b45def7124d2f50442a042f358e0d9",
+  "raw_rows": 12330,
+  "duplicates_removed": 125,
+  "rows": 12205,
+  "train_rows": 9764,
+  "test_rows": 2441,
+  "positive_rate": 0.15632937320770177,
+  "seed": 42,
+  "threshold": 0.5,
+  "excluded_features": [
+    "PageValues"
+  ],
+  "accuracy": 0.7582957804178615,
+  "precision": 0.3343949044585987,
+  "recall": 0.5497382198952879,
+  "f1": 0.4158415841584158,
+  "roc_auc": 0.7826475008200494,
+  "average_precision": 0.37242733333850403,
+  "brier_score": 0.1569344699513684,
+  "baseline_accuracy": 0.8435067595247849,
+  "confusion_matrix": [
+    [
+      1641,
+      418
+    ],
+    [
+      172,
+      210
+    ]
+  ],
+  "limitations": [
+    "Random stratified holdout, not a temporal or external validation.",
+    "Session-level retrospective prediction; not validated for early-session live conversion.",
+    "PageValues excluded to reduce target-leakage risk.",
+    "Probabilities are uncalibrated model scores."
+  ]
+}
