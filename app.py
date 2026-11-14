@@ -1,9 +1,11 @@
 """Retail intelligence dashboard. Run: streamlit run app.py."""
+from pathlib import Path
+import pandas as pd
 import streamlit as st
 from PIL import Image, UnidentifiedImageError
 import engine
 
-st.set_page_config(page_title="RetailLens | Commerce Intelligence", page_icon="???", layout="wide")
+st.set_page_config(page_title="RetailLens | Commerce Intelligence", page_icon=":shopping_bags:", layout="wide")
 st.markdown("""<style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 html,body,[class*="css"],.stApp{font-family:Inter,sans-serif}
@@ -14,25 +16,40 @@ html,body,[class*="css"],.stApp{font-family:Inter,sans-serif}
 [data-testid="stForm"]{background:white;border:1px solid #dbe5ef;border-radius:16px;padding:24px}
 .stButton button,.stFormSubmitButton button{border-radius:10px}
 button[data-baseweb="tab"]{font-size:15px;padding:14px}
+.hero{background:linear-gradient(115deg,#102c46,#124d61);padding:36px 40px;border-radius:22px;margin-bottom:24px;color:#e7f4f5;box-shadow:0 12px 36px #14334d18}
+.hero h1{color:white;font-size:3.4rem;letter-spacing:-2px;padding:6px 0}
+.hero p{font-size:1.2rem;color:#e1eff2}.eyebrow{font-size:.75rem;letter-spacing:2px;color:#8bd9d1;font-weight:600}
+.hero-detail{font-size:.85rem;color:#bfdae3;margin-top:20px}
+[data-testid="stVerticalBlockBorderWrapper"]{border-radius:16px}
+@media(max-width:700px){.hero{padding:24px}.hero h1{font-size:2.5rem}.hero-detail{line-height:1.8}.block-container{padding:1rem}}
 </style>""", unsafe_allow_html=True)
-st.caption("RETAILLENS ? E-COMMERCE INTELLIGENCE")
-st.title("Understand your customers. Discover your products.")
-st.write("Choose a tool below to explore a shopping session, find similar products, identify an image, or analyze a review.")
+st.markdown("""<div class="hero"><div class="eyebrow">E-COMMERCE INTELLIGENCE PLATFORM</div>
+<h1>RetailLens</h1><p>Explore the intelligence behind a better shopping experience.</p>
+<div class="hero-detail">Purchase prediction &nbsp; / &nbsp; Product discovery &nbsp; / &nbsp; Computer vision &nbsp; / &nbsp; Customer sentiment</div></div>""", unsafe_allow_html=True)
 with st.sidebar:
     st.header("RetailLens")
     st.write("Your retail intelligence workspace")
     st.divider()
     st.markdown("**Quick demo**")
-    st.write("Predict a session ? Find similar products ? Upload an image ? Analyze a review")
+    st.write("Start with purchase intent, explore similar products, upload an image, then analyze a review.")
     st.divider()
     st.caption("Built with Python, Random Forest, TF-IDF, MobileNet V3 and VADER.")
+    guide = Path(__file__).parent / "docs/viva-guide.pdf"
+    if guide.exists():
+        st.download_button("Download viva guide", guide.read_bytes(), "RetailLens-viva-guide.pdf", mime="application/pdf")
+    st.link_button("View project on GitHub", "https://github.com/harshagnihotri-rgb/deep-learning")
     st.info("Academic demonstration. Model estimates need validation on your own store.")
-tabs = st.tabs(["Overview", "Purchase intent", "Similar products", "Image lab", "Review sentiment"])
+tabs = st.tabs(["Overview", "Purchase intent", "Similar products", "Image lab", "Review sentiment", "Project guide"])
 with tabs[0]:
     st.subheader("What would you like to explore?")
     for col, title, body in zip(st.columns(4), ["Predict", "Discover", "Classify", "Listen"], ["Estimate purchase intent from browsing sessions.", "Find products with similar descriptions.", "Inspect pretrained CNN image predictions.", "Score positive and negative customer language."]):
-        col.markdown(f"### {title}"); col.write(body)
-    st.subheader("Measured evaluation")
+        with col:
+            with st.container(border=True):
+                st.subheader(title)
+                st.write(body)
+    st.divider()
+    st.subheader("How well does purchase prediction perform?")
+    st.write("Results below come from shopping sessions held back during training.")
     try:
         metrics = engine.load_metrics()
         a, b, c, d = st.columns(4)
@@ -97,7 +114,7 @@ with tabs[2]:
                 st.caption(product["category"])
                 st.subheader(product["name"])
                 st.write(product["description"])
-                st.write(f"?{product['price']:,.0f}")
+                st.write(f"INR {product['price']:,.0f}")
                 st.caption(f"Description similarity {product['similarity']:.0%}")
     with st.expander("Browse the full demo catalog"):
         st.dataframe(catalog, hide_index=True)
@@ -116,7 +133,10 @@ with tabs[3]:
             st.image(photo, width=300)
             if st.button("Analyze image", type="primary"):
                 with st.spinner("Loading CNN and analyzing image..."):
-                    st.dataframe(engine.classify_image(photo), hide_index=True)
+                    predictions = engine.classify_image(photo)
+                st.success(f"Top prediction: {predictions[0]['label'].replace('_', ' ').title()}")
+                chart = pd.DataFrame(predictions).set_index("label")
+                st.bar_chart(chart, horizontal=True, color="#087f8c")
                 st.caption("Scores are model softmax outputs, not verified confidence. First use downloads pretrained weights.")
         except (UnidentifiedImageError, ValueError, OSError, Image.DecompressionBombError) as exc:
             st.error(f"Cannot process image: {exc}")
@@ -138,3 +158,26 @@ with tabs[4]:
             st.caption("These proportions describe the sentiment composition of the text.")
     st.caption("English VADER sentiment handles many negations and intensifiers. Sarcasm, mixed opinions and other languages remain limitations.")
 
+
+with tabs[5]:
+    st.subheader("Present the project with confidence")
+    st.write("RetailLens combines four techniques to explore customer behaviour and product information in a single interactive application.")
+    architecture, presentation = st.columns(2)
+    with architecture:
+        with st.container(border=True):
+            st.markdown("### How the system works")
+            st.write("User input / Preprocessing / Model inference / Dashboard result")
+            st.dataframe(pd.DataFrame([
+                {"Module": "Purchase intent", "Method": "Random Forest", "Input": "Browsing session"},
+                {"Module": "Similar products", "Method": "TF-IDF + cosine similarity", "Input": "Product descriptions"},
+                {"Module": "Image lab", "Method": "MobileNet V3 CNN", "Input": "Uploaded photograph"},
+                {"Module": "Review sentiment", "Method": "VADER", "Input": "English review"}
+            ]), hide_index=True)
+    with presentation:
+        with st.container(border=True):
+            st.markdown("### Your five-minute demo")
+            st.markdown("1. Explain the retail problem and the four modules.\n2. Submit a browsing session and explain the probability.\n3. Select headphones and discuss the related products.\n4. Upload an object photo and explain the CNN output.\n5. Compare 'good' with 'not good' in review sentiment.\n6. Finish with the measured results and improvements.")
+    with st.expander("Dataset, evaluation and limitations", expanded=True):
+        st.write("Purchase prediction uses the UCI Online Shoppers Purchasing Intention dataset. After removing duplicates, 9,764 sessions train the model and 2,441 sessions evaluate it. PageValues is excluded to reduce leakage risk.")
+        st.write("The class-balanced model has 75.8% accuracy and 55.0% purchase recall. The majority baseline has 84.4% accuracy and detects zero purchases. ROC-AUC is 0.783. These results describe historical sessions, and live early-session performance remains unvalidated.")
+        st.write("The image model uses pretrained ImageNet weights. Product-category fine-tuning needs labeled images. The catalog contains demonstration products. Sentiment analysis can struggle with sarcasm and mixed opinions.")
