@@ -1,5 +1,4 @@
 """Retail intelligence dashboard. Run: streamlit run app.py."""
-from pathlib import Path
 import pandas as pd
 import streamlit as st
 from PIL import Image, UnidentifiedImageError
@@ -34,9 +33,6 @@ with st.sidebar:
     st.write("Start with purchase intent, explore similar products, upload an image, then analyze a review.")
     st.divider()
     st.caption("Built with Python, Random Forest, TF-IDF, MobileNet V3 and VADER.")
-    guide = Path(__file__).parent / "docs/viva-guide.pdf"
-    if guide.exists():
-        st.download_button("Download viva guide", guide.read_bytes(), "RetailLens-viva-guide.pdf", mime="application/pdf")
     st.link_button("View project on GitHub", "https://github.com/harshagnihotri-rgb/deep-learning")
     st.info("Academic demonstration. Model estimates need validation on your own store.")
 tabs = st.tabs(["Overview", "Purchase intent", "Similar products", "Image lab", "Review sentiment", "Project guide"])
