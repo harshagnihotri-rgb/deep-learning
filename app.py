@@ -34,7 +34,6 @@ with st.sidebar:
     st.divider()
     st.caption("Built with Python, Random Forest, TF-IDF, MobileNet V3 and VADER.")
     st.link_button("View project on GitHub", "https://github.com/harshagnihotri-rgb/deep-learning")
-    st.info("Academic demonstration. Model estimates need validation on your own store.")
 tabs = st.tabs(["Overview", "Purchase intent", "Similar products", "Image lab", "Review sentiment", "Project guide"])
 with tabs[0]:
     st.subheader("What would you like to explore?")
